@@ -1,4 +1,4 @@
-from fastapi import Query, APIRouter
+from fastapi import Query, APIRouter, Body
 
 from schemas.hotels import Hotel, HotelPATCH
 
@@ -26,7 +26,16 @@ def get_hotels(
     return hotels_
 
 @router.post("", summary="Добавление данных об отеле")
-def create_hotel(hotel_data: Hotel):
+def create_hotel(hotel_data: Hotel = Body(openapi_examples={
+    "1": {"summary": "Сочи", "value": {
+        "title": "Отель Сочи чето чето",
+        "name": "sochi cheto cheto",
+    }},
+    "2" : {"summary": "Дубай", "value": {
+        "title": "Отель Дубай чето чето",
+        "name": "dubai cheto cheto",
+    }},
+})):
     global hotels
 
     hotels.routerend({
