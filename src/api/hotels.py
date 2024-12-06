@@ -10,16 +10,24 @@ from src.schemas.hotels import Hotel, HotelPATCH
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
-
-
 @router.get("", summary="Получение данных об отеле")
 async def get_hotels(
     pagination: PaginationDep,
     hotel_id: int | None = Query(None, description="Айди отеля"),
     title: str | None = Query(None, description="Название отеля"),
 ):
+    per_page = pagination.per_page or 5
     async with async_session_maker() as session:
         query = select(HotelsOrm)
+        if id:
+            query = query.filter_by(id=id)
+        if title:
+            query = query.filter_by(title=title)
+        query = (
+            query
+            .limit(pagination.per_page)
+            .offset(pagination.per_page * (pagination.page - 1))
+        )
         result = await session.execute(query)
         hotels = result.scalars().all()
 
