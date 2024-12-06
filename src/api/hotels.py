@@ -1,6 +1,6 @@
 from fastapi import Query, APIRouter, Body
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
@@ -13,40 +13,35 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 @router.get("", summary="Получение данных об отеле")
 async def get_hotels(
     pagination: PaginationDep,
-    hotel_id: int | None = Query(None, description="Айди отеля"),
     title: str | None = Query(None, description="Название отеля"),
+    location: str | None = Query(None, description="Локация отеля"),
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
         query = select(HotelsOrm)
-        if id:
-            query = query.filter_by(id=id)
         if title:
-            query = query.filter_by(title=title)
+            query = query.filter(func.lower(HotelsOrm.title).like(f"%{title.strip().lower()}%"))
+        if location:
+            query = query.filter(func.lower(HotelsOrm.location).like(f"%{location.strip().lower()}%"))
         query = (
             query
-            .limit(pagination.per_page)
-            .offset(pagination.per_page * (pagination.page - 1))
+            .limit(per_page)
+            .offset(per_page * (pagination.page - 1))
         )
         result = await session.execute(query)
         hotels = result.scalars().all()
 
         return hotels
 
-    # if pagination.page and pagination.per_page:
-    #     start_index = (pagination.page - 1) * pagination.per_page
-    #     end_index = start_index + pagination.per_page
-    #     hotels_ = hotels_[start_index:end_index]
-
 @router.post("", summary="Добавление данных об отеле")
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
-        "title": "Отель Сочи чето чето",
-        "location": "cheto cheto",
+        "title": "Отель Rich чето чето",
+        "location": "Сочи, ул. Мира 22",
     }},
     "2" : {"summary": "Дубай", "value": {
-        "title": "Отель Дубай чето чето",
-        "location": "cheto cheto",
+        "title": "Отель Resort чето чето",
+        "location": "Дубай, ул. Дубайская 3",
     }},
 })):
     
