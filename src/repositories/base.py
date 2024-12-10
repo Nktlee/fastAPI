@@ -26,10 +26,10 @@ class BaseRepository:
 
         return result.scalars().one()
     
-    async def edit(self, data: BaseModel, id: int) -> None:
-        query = update(self.model).where(self.model.id == id).values(**data.model_dump())
+    async def edit(self, data: BaseModel, **filter_by: dict) -> None:
+        query = update(self.model).filter_by(**filter_by).values(**data.model_dump())
         await self.session.execute(query)
 
-    async def delete(self, id: int) -> None:
-        query = delete(self.model).where(self.model.id == id)
+    async def delete(self, **filter_by: dict) -> None:
+        query = delete(self.model).filter_by(**filter_by)
         await self.session.execute(query)
