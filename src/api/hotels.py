@@ -25,9 +25,7 @@ async def get_hotels(
             limit=per_page,
             offset=per_page * (pagination.page - 1)
         )
-
     
-
 @router.post("", summary="Добавление данных об отеле")
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
@@ -41,12 +39,13 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
 })):
     
     async with async_session_maker() as session:
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
+        hotel = await HotelsRepository(session).add(hotel_data)
+        # add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
         # print(add_hotel_stmt.compile(compile_kwargs={"literal_binds": True})) 
-        await session.execute(add_hotel_stmt)
+        # await session.execute(add_hotel_stmt)
         await session.commit()
 
-    return {"status": "ok"}
+    return {"status": "ok", "data": hotel}
 
 @router.delete("/{hotel_id}", summary="Удаление данных об отеле")
 def delete_hotel(hotel_id: int):
