@@ -6,6 +6,7 @@ from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
 from src.models.hotels import HotelsOrm
 from src.schemas.hotels import Hotel, HotelPATCH
+from src.repositories.hotels import HotelsRepository
 
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -18,20 +19,14 @@ async def get_hotels(
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        query = select(HotelsOrm)
-        if title:
-            query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))
-        if location:
-            query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))
-        query = (
-            query
-            .limit(per_page)
-            .offset(per_page * (pagination.page - 1))
+        return await HotelsRepository(session).get_all(
+            location=location,
+            title=title,
+            limit=per_page,
+            offset=per_page * (pagination.page - 1)
         )
-        result = await session.execute(query)
-        hotels = result.scalars().all()
 
-        return hotels
+    
 
 @router.post("", summary="Добавление данных об отеле")
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
