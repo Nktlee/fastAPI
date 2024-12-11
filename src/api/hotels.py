@@ -1,10 +1,7 @@
 from fastapi import Query, APIRouter, Body
 
-from sqlalchemy import insert, select, func
-
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
-from src.models.hotels import HotelsOrm
 from src.schemas.hotels import Hotel, HotelPATCH
 from src.repositories.hotels import HotelsRepository
 
@@ -25,6 +22,11 @@ async def get_hotels(
             limit=per_page,
             offset=per_page * (pagination.page - 1)
         )
+    
+@router.get("/{hotel_id}")
+async def get_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
     
 @router.post("", summary="Добавление данных об отеле")
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
@@ -62,12 +64,9 @@ async def put_hotel(hotel_id: int, hotel_data: Hotel):
     return {"status": "ok"}
 
 @router.patch("/{hotel_id}", summary="Частичное изменение данных об отеле")
-def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
-    global hotels
-
-    if hotel_data.title != "string":
-        hotels[hotel_id - 1]["title"] = hotel_data.title
-    if hotel_data.name != "string":
-        hotels[hotel_id - 1]["name"] = hotel_data.name
+async def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, exclude_unset=True, id=hotel_id)
+        await session.commit()
 
     return {"status": "ok"}
