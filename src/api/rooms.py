@@ -50,13 +50,13 @@ async def delete_hotel(hotel_id: int, title: str):
 
     return {"status": "ok"}
 
-# @router.put("/{hotel_id}", summary="Изменение данных о номере")
-# async def put_hotel(hotel_id: int, hotel_data: HotelAdd):
-#     async with async_session_maker() as session:
-#         await RoomsRepository(session).edit(hotel_data, id=hotel_id)
-#         await session.commit()
+@router.put("/{hotel_id}", summary="Изменение данных о номере")
+async def put_hotel(hotel_id: int, title: str, room_data: RoomAdd):
+    async with async_session_maker() as session:
+        await RoomsRepository(session).edit(room_data, hotel_id=hotel_id, title=title)
+        await session.commit()
 
-#     return {"status": "ok"}
+    return {"status": "ok"}
 
 # @router.patch("/{hotel_id}", summary="Частичное изменение данных о")
 # async def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
