@@ -1,6 +1,6 @@
 from fastapi import Query, APIRouter, Body
 
-from src.schemas.rooms import RoomAdd
+from src.schemas.rooms import RoomAdd, RoomPATCH, RoomRequestAdd
 from src.repositories.rooms import RoomsRepository
 from src.database import async_session_maker
 
@@ -51,17 +51,17 @@ async def delete_hotel(hotel_id: int, title: str):
     return {"status": "ok"}
 
 @router.put("/{hotel_id}", summary="Изменение данных о номере")
-async def put_hotel(hotel_id: int, title: str, room_data: RoomAdd):
+async def put_hotel(hotel_id: int, title: str, room_data: RoomRequestAdd):
     async with async_session_maker() as session:
         await RoomsRepository(session).edit(room_data, hotel_id=hotel_id, title=title)
         await session.commit()
 
     return {"status": "ok"}
 
-# @router.patch("/{hotel_id}", summary="Частичное изменение данных о")
-# async def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
-#     async with async_session_maker() as session:
-#         await RoomsRepository(session).edit(hotel_data, exclude_unset=True, id=hotel_id)
-#         await session.commit()
+@router.patch("/{hotel_id}", summary="Частичное изменение данных о номере")
+async def patch_hotel(hotel_id: int, title: str, room_data: RoomPATCH):
+    async with async_session_maker() as session:
+        await RoomsRepository(session).edit(room_data, exclude_unset=True, hotel_id=hotel_id, title=title)
+        await session.commit()
 
-#     return {"status": "ok"}
+    return {"status": "ok"}
