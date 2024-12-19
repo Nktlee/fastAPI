@@ -11,9 +11,7 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 
 
 @router.post("/register")
-async def register_user(
-        data: UserRequestAdd
-):
+async def register_user(data: UserRequestAdd):
     hashed_password = AuthService().hash_password(data.password)
     new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
     async with async_session_maker() as session:
@@ -22,15 +20,17 @@ async def register_user(
 
     return {"status": "ok"}
 
+
 @router.post("/login")
-async def login_user(
-        data: UserRequestAdd,
-        response: Response
-):
+async def login_user(data: UserRequestAdd, response: Response):
     async with async_session_maker() as session:
-        user = await UsersRepository(session).get_user_with_hashed_password(email=data.email)
+        user = await UsersRepository(session).get_user_with_hashed_password(
+            email=data.email
+        )
         if not user:
-            raise HTTPException(status_code=401, detail="Пользователь с таким email не зарегистрирован")
+            raise HTTPException(
+                status_code=401, detail="Пользователь с таким email не зарегистрирован"
+            )
         if not AuthService().verify_password(data.password, user.hashed_password):
             raise HTTPException(status_code=401, detail="Пароль неверный")
 
@@ -39,18 +39,16 @@ async def login_user(
 
         return {"access_token": access_token}
 
+
 @router.get("/me")
-async def get_me(
-    user_id: UserIdDep
-):
+async def get_me(user_id: UserIdDep):
     async with async_session_maker() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user
-    
+
+
 @router.post("/logout")
-async def logout_user(
-    response: Response
-):
+async def logout_user(response: Response):
     response.delete_cookie("access_token")
 
     return {"status": "ok"}
