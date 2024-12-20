@@ -1,8 +1,8 @@
 """add hotels
 
-Revision ID: c54a8a92e115
+Revision ID: a4c4a59f9cf5
 Revises: 
-Create Date: 2024-12-06 17:04:35.691445
+Create Date: 2024-12-20 18:23:49.545202
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "c54a8a92e115"
+revision: str = "a4c4a59f9cf5"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
