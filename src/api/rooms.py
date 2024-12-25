@@ -68,9 +68,15 @@ async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: 
     return {"status": "ok"}
 
 
-@router.patch("/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере")
-async def patch_hotel(hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep):
-    _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
+@router.patch(
+    "/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере"
+)
+async def patch_hotel(
+    hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep
+):
+    _room_data = RoomPatch(
+        hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True)
+    )
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
     await db.commit()
 

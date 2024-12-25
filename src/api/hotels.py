@@ -51,7 +51,7 @@ async def create_hotel(
                 },
             },
         }
-    )
+    ),
 ):
     hotel = await db.hotels.add(hotel_data)
     await db.commit()
