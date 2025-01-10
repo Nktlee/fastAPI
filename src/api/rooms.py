@@ -79,21 +79,25 @@ async def delete_hotel(hotel_id: int, room_id: int, db: DBDep):
 async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: DBDep):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, hotel_id=hotel_id, id=room_id)
+    await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
+
     await db.commit()
 
     return {"status": "ok"}
 
 
-@router.patch(
-    "/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере"
-)
+@router.patch("/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере")
 async def patch_hotel(
     hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep
 ):
-    _room_data = RoomPatch(
-        hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True)
-    )
+    _room_data_dict = room_data.model_dump(exclude_unset=True)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
+
+    if "facilities_ids" in _room_data_dict:
+        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=_room_data_dict["facilities_ids"])
+  
+
     await db.commit()
 
     return {"status": "ok"}
