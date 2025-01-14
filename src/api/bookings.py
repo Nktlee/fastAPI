@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingRequestAdd, BookingAdd
@@ -8,11 +9,13 @@ router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
 @router.get("", summary="Получение всех бронирований")
+@cache(expire=10)
 async def get_bookings(db: DBDep):
     return await db.bookings.get_all()
 
 
 @router.get("/me", summary="Получение всех бронирований пользователя")
+@cache(expire=10)
 async def get_my_bookings(db: DBDep, user_id: UserIdDep):
     return await db.bookings.get_filtered(user_id=user_id)
 
