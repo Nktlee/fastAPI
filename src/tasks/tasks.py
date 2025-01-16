@@ -9,7 +9,7 @@ from src.utils.db_manager import DBManager
 from src.database import async_session_maker_null_pool
 
 
-@celery_instance.task
+# @celery_instance.task
 def resize_image(image_path: str):
     sizes = [1000, 500, 200]
     output_folder = "src/static/images"
