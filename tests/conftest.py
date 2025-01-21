@@ -1,11 +1,16 @@
+import json
 import pytest
 
 from httpx import AsyncClient
 
+from src.schemas.hotels import HotelAdd
+from src.schemas.rooms import RoomAdd
 from src.database import Base, engine_null_pool
 from src.models import *
 from src.main import app
 from src.config import settings
+from src.utils.db_manager import DBManager
+from src.database import async_session_maker_null_pool
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -19,6 +24,23 @@ async def setup_database(check_env_variables):
     async with engine_null_pool.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def fill_database(setup_database):
+    with open('tests/mock_hotels.json', 'r', encoding='utf-8') as file:
+        hotels = json.load(file)
+
+    with open('tests/mock_rooms.json', 'r', encoding='utf-8') as file:
+        rooms = json.load(file)
+
+    hotels = [HotelAdd.model_validate(hotel) for hotel in hotels]
+    rooms = [RoomAdd.model_validate(room) for room in rooms]
+
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
+        await db.hotels.add_bulk(hotels)
+        await db.rooms.add_bulk(rooms)
+        await db.commit()
 
 
 @pytest.fixture(scope="session", autouse=True)

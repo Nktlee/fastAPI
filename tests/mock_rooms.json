@@ -1,0 +1,23 @@
+[
+    {
+        "hotel_id": 1,
+        "title": "Номер 1",
+        "description": "Стандартный номер",
+        "price": 5000,
+        "quantity": 10
+    },
+    {
+        "hotel_id": 1,
+        "title": "Номер 2",
+        "description": "Люкс",
+        "price": 10000,
+        "quantity": 5
+    },
+    {
+        "hotel_id": 2,
+        "title": "Номер 3",
+        "description": "Эконом",
+        "price": 3000,
+        "quantity": 15
+    }
+]
