@@ -3,6 +3,7 @@ import pytest
 
 from httpx import AsyncClient
 
+from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
 from src.database import Base, engine_null_pool
@@ -23,6 +24,13 @@ async def check_env_variables():
 async def db():
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
+
+
+async def get_db_null_pool():
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
+        yield db
+
+app.dependency_overrides[get_db] = get_db_null_pool
 
 
 @pytest.fixture(scope="session", autouse=True)
