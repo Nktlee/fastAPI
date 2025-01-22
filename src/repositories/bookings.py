@@ -1,5 +1,6 @@
 from datetime import date
 
+from fastapi import HTTPException
 from sqlalchemy import select
 
 from src.repositories.mappers.mappers import BookingDataMapper
@@ -33,4 +34,4 @@ class BookingsRepository(BaseRepository):
         if data.room_id in rooms_ids_to_book:
             return await self.add(data)
         else:
-            raise Exception
+            raise HTTPException(500)
