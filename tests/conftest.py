@@ -1,3 +1,4 @@
+#ruff: noqa: E402
 import json
 
 from unittest import mock
@@ -12,7 +13,7 @@ from src.api.dependencies import get_db
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
 from src.database import Base, engine_null_pool
-from src.models import *
+from src.models import * #noqa
 from src.main import app
 from src.config import settings
 from src.utils.db_manager import DBManager
