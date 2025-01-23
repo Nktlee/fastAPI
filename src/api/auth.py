@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Response
+from pydantic import BaseModel
 
 from src.repositories.users import UsersRepository
 from src.schemas.users import UserAdd, UserRequestAdd
@@ -11,7 +12,7 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 
 
 @router.post("/register")
-async def register_user(db: DBDep, data: UserRequestAdd):
+async def register_user(db: DBDep, data: UserRequestAdd) -> dict:
     users = await db.users.get_all()
     emails = [user.email for user in users]
     if data.email in emails:
@@ -27,7 +28,7 @@ async def register_user(db: DBDep, data: UserRequestAdd):
 
 
 @router.post("/login")
-async def login_user(data: UserRequestAdd, response: Response):
+async def login_user(data: UserRequestAdd, response: Response) -> dict:
     async with async_session_maker_null_pool() as session:
         try:
             user = await UsersRepository(session).get_user_with_hashed_password(email=data.email)
@@ -45,7 +46,7 @@ async def login_user(data: UserRequestAdd, response: Response):
 
 
 @router.get("/me")
-async def get_me(user_id: UserIdDep):
+async def get_me(user_id: UserIdDep) -> BaseModel:
     async with async_session_maker_null_pool() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user

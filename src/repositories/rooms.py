@@ -2,7 +2,9 @@ from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import NoResultFound
 
+from exceptions import ObjectNotFoundException
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 from src.repositories.utils import rooms_ids_for_booking
 from src.repositories.base import BaseRepository
@@ -23,17 +25,22 @@ class RoomsRepository(BaseRepository):
         )
         result = await self.session.execute(query)
 
-        return [
+        models = [
             RoomDataWithRelsMapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
 
-    async def get_one_or_none(self, **filter_by):
+        if models:
+            return models
+        raise ObjectNotFoundException
+
+    async def get_one(self, **filter_by):
         query = (
             select(self.model).options(selectinload(self.model.facilities)).filter_by(**filter_by)
         )
         result = await self.session.execute(query)
-        model = result.scalars().one_or_none()
+        try:
+            model = result.scalar_one()
+        except NoResultFound:
+            raise ObjectNotFoundException
 
-        if model:
-            return RoomDataWithRelsMapper.map_to_domain_entity(model)
-        return None
+        return RoomDataWithRelsMapper.map_to_domain_entity(model)

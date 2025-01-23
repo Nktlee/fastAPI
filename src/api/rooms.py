@@ -1,8 +1,9 @@
 from datetime import date
 
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body, HTTPException, Query
 from fastapi_cache.decorator import cache
 
+from exceptions import ObjectNotFoundException
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomRequestAdd, RoomRequestPatch
 from src.api.dependencies import DBDep
@@ -19,15 +20,23 @@ async def get_rooms(
     date_from: date = Query(example="2025-02-01"),
     date_to: date = Query(example="2025-02-07"),
 ):
-    return await db.rooms.get_filtered_by_time(
-        hotel_id=hotel_id, date_from=date_from, date_to=date_to
-    )
+    try:
+        models = await db.rooms.get_filtered_by_time(
+            hotel_id=hotel_id, date_from=date_from, date_to=date_to
+        )
+    except ObjectNotFoundException:
+        raise HTTPException(status_code=404, detail="Номер не найден")
+    return models
 
 
 @router.get("/{hotel_id}/rooms/{room_id}", summary="Получение данных об одном номере")
 @cache(expire=10)
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
-    return await db.rooms.get_one_or_none(hotel_id=hotel_id, id=room_id)
+    try:
+        model = await db.rooms.get_filtered_by_time(hotel_id=hotel_id, id=room_id)
+    except ObjectNotFoundException:
+        raise HTTPException(status_code=404, detail="Номер не найден")
+    return model
 
 
 @router.post("/{hotel_id}/rooms", summary="Добавление данных о номере")
