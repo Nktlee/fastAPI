@@ -43,7 +43,7 @@ async def create_room(
                     "description": "Одноместные номера",
                     "price": 1000,
                     "quantity": 10,
-                    "facilities_ids": [1,2]
+                    "facilities_ids": [1, 2],
                 },
             },
             "2": {
@@ -53,7 +53,7 @@ async def create_room(
                     "description": "Двухместные номера",
                     "price": 2000,
                     "quantity": 10,
-                    "facilities_ids": [1,2]
+                    "facilities_ids": [1, 2],
                 },
             },
         }
@@ -62,7 +62,9 @@ async def create_room(
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
 
-    rooms_facilities_data = [RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    rooms_facilities_data = [
+        RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids
+    ]
 
     await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
@@ -90,16 +92,15 @@ async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: 
 
 
 @router.patch("/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере")
-async def patch_hotel(
-    hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep
-):
+async def patch_hotel(hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep):
     _room_data_dict = room_data.model_dump(exclude_unset=True)
     _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
 
     if "facilities_ids" in _room_data_dict:
-        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=_room_data_dict["facilities_ids"])
-  
+        await db.rooms_facilities.set_room_facilities(
+            room_id, facilities_ids=_room_data_dict["facilities_ids"]
+        )
 
     await db.commit()
 

@@ -28,7 +28,7 @@ async def get_hotels(
         title=title,
         location=location,
         limit=per_page,
-        offset=per_page * (pagination.page - 1)
+        offset=per_page * (pagination.page - 1),
     )
 
 

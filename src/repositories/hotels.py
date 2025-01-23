@@ -15,13 +15,7 @@ class HotelsRepository(BaseRepository):
     mapper = HotelDataMapper
 
     async def get_filtered_by_time(
-        self,
-        date_from: date,
-        date_to: date,
-        title: str,
-        location: str,
-        limit: int,
-        offset: int
+        self, date_from: date, date_to: date, title: str, location: str, limit: int, offset: int
     ) -> list[Hotel]:
         rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to)
 

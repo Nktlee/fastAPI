@@ -6,15 +6,18 @@ import pytest
 from tests.conftest import get_db_null_pool
 
 
-@pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
-    (2, "2025-02-01", "2025-02-05", 200),
-    (2, "2025-02-01", "2025-02-05", 200),
-    (2, "2025-02-01", "2025-02-05", 200),
-    (2, "2025-02-01", "2025-02-05", 200),
-    (2, "2025-02-01", "2025-02-05", 200),
-    (2, "2025-02-01", "2025-02-05", 500),
-    (2, "2025-03-01", "2025-03-05", 200),
-])
+@pytest.mark.parametrize(
+    "room_id, date_from, date_to, status_code",
+    [
+        (2, "2025-02-01", "2025-02-05", 200),
+        (2, "2025-02-01", "2025-02-05", 200),
+        (2, "2025-02-01", "2025-02-05", 200),
+        (2, "2025-02-01", "2025-02-05", 200),
+        (2, "2025-02-01", "2025-02-05", 200),
+        (2, "2025-02-01", "2025-02-05", 500),
+        (2, "2025-03-01", "2025-03-05", 200),
+    ],
+)
 async def test_add_booking(
     room_id: int,
     date_from: str,
@@ -28,7 +31,7 @@ async def test_add_booking(
             "room_id": room_id,
             "date_from": date_from,
             "date_to": date_to,
-        }
+        },
     )
 
     assert response.status_code == status_code
@@ -46,11 +49,14 @@ async def delete_all_bookings():
         await _db.commit()
 
 
-@pytest.mark.parametrize("room_id, date_from, date_to, booked_rooms", [
-    (2, "2025-02-01", "2025-02-05", 1),
-    (2, "2025-02-01", "2025-02-05", 2),
-    (2, "2025-02-01", "2025-02-05", 3),
-])
+@pytest.mark.parametrize(
+    "room_id, date_from, date_to, booked_rooms",
+    [
+        (2, "2025-02-01", "2025-02-05", 1),
+        (2, "2025-02-01", "2025-02-05", 2),
+        (2, "2025-02-01", "2025-02-05", 3),
+    ],
+)
 async def test_add_and_get_my_bookings(
     room_id: int,
     date_from: str,
@@ -65,7 +71,7 @@ async def test_add_and_get_my_bookings(
             "room_id": room_id,
             "date_from": date_from,
             "date_to": date_to,
-        }
+        },
     )
     assert response.status_code == 200
 

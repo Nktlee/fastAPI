@@ -3,12 +3,15 @@ from httpx import AsyncClient
 import pytest
 
 
-@pytest.mark.parametrize("email, password, status_code", [
-    ("test@test.com", "1234", 200),
-    ("test@example.com", "password123", 200),
-    ("test2@example.com", "password123", 200),
-    ("test@test.ru", "1234", 400),
-])
+@pytest.mark.parametrize(
+    "email, password, status_code",
+    [
+        ("test@test.com", "1234", 200),
+        ("test@example.com", "password123", 200),
+        ("test2@example.com", "password123", 200),
+        ("test@test.ru", "1234", 400),
+    ],
+)
 async def test_register_user(
     email: str,
     password: str,
@@ -16,22 +19,21 @@ async def test_register_user(
     authenticated_ac: AsyncClient,
 ):
     response_register = await authenticated_ac.post(
-        "/auth/register",
-        json={
-            "email": email,
-            "password": password
-        }
+        "/auth/register", json={"email": email, "password": password}
     )
     assert response_register.status_code == status_code
 
 
-@pytest.mark.parametrize("email, password, status_code", [
-    ("test@test.com", "1234", 200),
-    ("test@example.com", "password123", 200),
-    ("test2@example.com", "password123", 200),
-    ("nktlee@example.com", "password123", 401),
-    ("test2@example.com", "password12", 401),
-])
+@pytest.mark.parametrize(
+    "email, password, status_code",
+    [
+        ("test@test.com", "1234", 200),
+        ("test@example.com", "password123", 200),
+        ("test2@example.com", "password123", 200),
+        ("nktlee@example.com", "password123", 401),
+        ("test2@example.com", "password12", 401),
+    ],
+)
 async def test_login_user(
     email: str,
     password: str,
@@ -39,11 +41,7 @@ async def test_login_user(
     authenticated_ac: AsyncClient,
 ):
     response_login = await authenticated_ac.post(
-        "/auth/login",
-        json={
-            "email": email,
-            "password": password
-        }
+        "/auth/login", json={"email": email, "password": password}
     )
     assert response_login.status_code == status_code
     if status_code == 200:

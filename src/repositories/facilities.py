@@ -11,15 +11,13 @@ class FacilitiesRepository(BaseRepository):
     model = FacilitiesOrm
     mapper = FacilityDataMapper
 
+
 class RoomsFacilitiesRepository(BaseRepository):
     model = RoomsFacilitiesOrm
     schema = RoomFacility
 
     async def set_room_facilities(self, room_id: int, facilities_ids: list[int]):
-        current_facilities_ids_query = (
-            select(self.model.facility_id)
-            .filter_by(room_id=room_id)
-        )
+        current_facilities_ids_query = select(self.model.facility_id).filter_by(room_id=room_id)
         res = await self.session.execute(current_facilities_ids_query)
         current_facilities_ids = res.scalars().all()
 
@@ -27,18 +25,13 @@ class RoomsFacilitiesRepository(BaseRepository):
         ids_to_add = list(set(facilities_ids) - set(current_facilities_ids))
 
         if ids_to_add:
-            query = (
-                insert(self.model)
-                .values([{"room_id": room_id, "facility_id": f_id} for f_id in ids_to_add])
+            query = insert(self.model).values(
+                [{"room_id": room_id, "facility_id": f_id} for f_id in ids_to_add]
             )
             await self.session.execute(query)
 
         if ids_to_delete:
-            query = (
-                delete(self.model)
-                .filter(
-                    self.model.room_id == room_id,
-                    self.model.facility_id.in_(ids_to_delete)
-                )
+            query = delete(self.model).filter(
+                self.model.room_id == room_id, self.model.facility_id.in_(ids_to_delete)
             )
             await self.session.execute(query)
