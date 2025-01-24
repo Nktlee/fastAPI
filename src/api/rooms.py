@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Body, HTTPException, Query
 from fastapi_cache.decorator import cache
 
-from exceptions import ObjectNotFoundException
+from exceptions import ObjectNotFoundException, WrongDateException
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomRequestAdd, RoomRequestPatch
 from src.api.dependencies import DBDep
@@ -26,6 +26,8 @@ async def get_rooms(
         )
     except ObjectNotFoundException:
         raise HTTPException(status_code=400, detail="Номер не найден")
+    except WrongDateException as ex:
+        raise HTTPException(status_code=409, detail=ex.detail)
     return models
 
 
@@ -33,7 +35,7 @@ async def get_rooms(
 @cache(expire=10)
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
     try:
-        model = await db.rooms.get_filtered_by_time(hotel_id=hotel_id, id=room_id)
+        model = await db.rooms.get_one(hotel_id=hotel_id, id=room_id)
     except ObjectNotFoundException:
         raise HTTPException(status_code=400, detail="Номер не найден")
     return model

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import NoResultFound
 
-from exceptions import ObjectNotFoundException
+from exceptions import ObjectNotFoundException, WrongDateException
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 from src.repositories.utils import rooms_ids_for_booking
 from src.repositories.base import BaseRepository
@@ -16,7 +16,10 @@ class RoomsRepository(BaseRepository):
     mapper = RoomDataMapper
 
     async def get_filtered_by_time(self, hotel_id: int, date_from: date, date_to: date):
-        rooms_ids_to_get = rooms_ids_for_booking(date_from, date_to, hotel_id)
+        try:
+            rooms_ids_to_get = rooms_ids_for_booking(date_from, date_to, hotel_id)
+        except ValueError:
+            raise WrongDateException
 
         query = (
             select(self.model)
