@@ -68,6 +68,10 @@ async def create_room(
         }
     ),
 ):
+    hotels = await db.hotels.get_all()
+    hotel_ids = [hotel.id for hotel in hotels]
+    if hotel_id not in hotel_ids:
+        raise HTTPException(status_code=404, detail="Отеля не существует")
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
 
@@ -83,6 +87,10 @@ async def create_room(
 
 @router.delete("/{hotel_id}/rooms/{room_id}", summary="Удаление данных о номере")
 async def delete_hotel(hotel_id: int, room_id: int, db: DBDep):
+    rooms = await db.rooms.get_all()
+    room_ids = [room.id for room in rooms]
+    if room_id not in room_ids:
+        raise HTTPException(status_code=404, detail="Номера не существует")
     await db.rooms.delete(hotel_id=hotel_id, id=room_id)
     await db.commit()
 
@@ -91,10 +99,13 @@ async def delete_hotel(hotel_id: int, room_id: int, db: DBDep):
 
 @router.put("/{hotel_id}/rooms/{room_id}", summary="Изменение данных о номере")
 async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: DBDep):
+    rooms = await db.rooms.get_all()
+    room_ids = [room.id for room in rooms]
+    if room_id not in room_ids:
+        raise HTTPException(status_code=404, detail="Номера не существует")
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, hotel_id=hotel_id, id=room_id)
     await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
-
     await db.commit()
 
     return {"status": "ok"}
@@ -102,6 +113,10 @@ async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: 
 
 @router.patch("/{hotel_id}/rooms/{room_id}", summary="Частичное изменение данных о номере")
 async def patch_hotel(hotel_id: int, room_id: int, room_data: RoomRequestPatch, db: DBDep):
+    rooms = await db.rooms.get_all()
+    room_ids = [room.id for room in rooms]
+    if room_id not in room_ids:
+        raise HTTPException(status_code=404, detail="Номера не существует")
     _room_data_dict = room_data.model_dump(exclude_unset=True)
     _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
