@@ -25,7 +25,7 @@ async def get_rooms(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
         )
     except ObjectNotFoundException:
-        raise HTTPException(status_code=404, detail="Номер не найден")
+        raise HTTPException(status_code=400, detail="Номер не найден")
     return models
 
 
@@ -35,7 +35,7 @@ async def get_room(hotel_id: int, room_id: int, db: DBDep):
     try:
         model = await db.rooms.get_filtered_by_time(hotel_id=hotel_id, id=room_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=404, detail="Номер не найден")
+        raise HTTPException(status_code=400, detail="Номер не найден")
     return model
 
 
@@ -71,7 +71,7 @@ async def create_room(
     hotels = await db.hotels.get_all()
     hotel_ids = [hotel.id for hotel in hotels]
     if hotel_id not in hotel_ids:
-        raise HTTPException(status_code=404, detail="Отеля не существует")
+        raise HTTPException(status_code=400, detail="Отеля не существует")
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
 
@@ -90,7 +90,7 @@ async def delete_hotel(hotel_id: int, room_id: int, db: DBDep):
     rooms = await db.rooms.get_all()
     room_ids = [room.id for room in rooms]
     if room_id not in room_ids:
-        raise HTTPException(status_code=404, detail="Номера не существует")
+        raise HTTPException(status_code=400, detail="Номера не существует")
     await db.rooms.delete(hotel_id=hotel_id, id=room_id)
     await db.commit()
 
@@ -102,7 +102,7 @@ async def put_hotel(hotel_id: int, room_id: int, room_data: RoomRequestAdd, db: 
     rooms = await db.rooms.get_all()
     room_ids = [room.id for room in rooms]
     if room_id not in room_ids:
-        raise HTTPException(status_code=404, detail="Номера не существует")
+        raise HTTPException(status_code=400, detail="Номера не существует")
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, hotel_id=hotel_id, id=room_id)
     await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
@@ -116,7 +116,7 @@ async def patch_hotel(hotel_id: int, room_id: int, room_data: RoomRequestPatch, 
     rooms = await db.rooms.get_all()
     room_ids = [room.id for room in rooms]
     if room_id not in room_ids:
-        raise HTTPException(status_code=404, detail="Номера не существует")
+        raise HTTPException(status_code=400, detail="Номера не существует")
     _room_data_dict = room_data.model_dump(exclude_unset=True)
     _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
