@@ -7,9 +7,6 @@ from src.models.rooms import RoomsOrm
 
 
 def rooms_ids_for_booking(date_from: date, date_to: date, hotel_id: int | None = None):
-    if date_from >= date_to:
-        raise ValueError("Дата заезда должна быть раньше, чем дата выезда")
-    
     rooms_count = (
         select(BookingsOrm.room_id, func.count("*").label("rooms_booked"))
         .select_from(BookingsOrm)
