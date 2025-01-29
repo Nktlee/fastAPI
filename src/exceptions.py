@@ -20,7 +20,9 @@ class AllRoomsAreBookedException(NabronirovalException):
 
 def date_to_after_date_from(date_from: date, date_to: date):
     if date_from >= date_to:
-        raise HTTPException(status_code=400, detail="Дата заезда должна быть раньше, чем дата выезда")
+        raise HTTPException(
+            status_code=400, detail="Дата заезда должна быть раньше, чем дата выезда"
+        )
 
 
 class NabronirovalHTTPException(HTTPException):

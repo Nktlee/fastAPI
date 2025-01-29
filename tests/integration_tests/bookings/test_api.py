@@ -20,9 +20,7 @@ async def test_add_booking(
     status_code: int,
     authenticated_ac,
 ):
-    await authenticated_ac.post(
-        "/auth/login", json={"email": "test@test.com", "password": "1234"}
-    )
+    await authenticated_ac.post("/auth/login", json={"email": "test@test.com", "password": "1234"})
 
     response = await authenticated_ac.post(
         "/bookings",
@@ -62,7 +60,7 @@ async def test_add_and_get_my_bookings(
     date_to: str,
     booked_rooms: int,
     authenticated_ac,
-    delete_all_bookings
+    delete_all_bookings,
 ):
     response = await authenticated_ac.post(
         "/bookings",

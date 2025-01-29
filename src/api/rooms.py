@@ -3,7 +3,12 @@ from datetime import date
 from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
-from exceptions import HotelNotFoundHTTPException, ObjectNotFoundException, RoomNotFoundHTTPException, date_to_after_date_from
+from exceptions import (
+    HotelNotFoundHTTPException,
+    ObjectNotFoundException,
+    RoomNotFoundHTTPException,
+    date_to_after_date_from,
+)
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomRequestAdd, RoomRequestPatch
 from src.api.dependencies import DBDep

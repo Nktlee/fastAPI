@@ -31,7 +31,7 @@ class BaseRepository:
         if model is None:
             return None
         return self.mapper.map_to_domain_entity(model)
-    
+
     async def get_one(self, **filter: dict) -> BaseModel:
         query = select(self.model).filter_by(**filter)
         result = await self.session.execute(query)
