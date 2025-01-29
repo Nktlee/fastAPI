@@ -4,7 +4,7 @@
         "title": "Номер 1",
         "description": "Стандартный номер",
         "price": 5000,
-        "quantity": 10
+        "quantity": 3
     },
     {
         "hotel_id": 1,

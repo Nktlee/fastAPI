@@ -1,5 +1,3 @@
-from typing import Callable
-
 import pytest
 
 from tests.conftest import get_db_null_pool
@@ -8,11 +6,11 @@ from tests.conftest import get_db_null_pool
 @pytest.mark.parametrize(
     "room_id, date_from, date_to, status_code",
     [
-        (2, "2025-02-01", "2025-02-05", 200),
-        (2, "2025-02-01", "2025-02-05", 200),
-        (2, "2025-02-01", "2025-02-05", 200),
-        (2, "2025-02-01", "2025-02-05", 500),
-        (2, "2025-03-01", "2025-03-05", 200),
+        (1, "2025-02-01", "2025-02-05", 200),
+        (1, "2025-02-01", "2025-02-05", 200),
+        (1, "2025-02-01", "2025-02-05", 200),
+        (1, "2025-02-01", "2025-02-05", 409),
+        (1, "2025-03-01", "2025-03-05", 200),
     ],
 )
 async def test_add_booking(
@@ -22,6 +20,10 @@ async def test_add_booking(
     status_code: int,
     authenticated_ac,
 ):
+    await authenticated_ac.post(
+        "/auth/login", json={"email": "test@test.com", "password": "1234"}
+    )
+
     response = await authenticated_ac.post(
         "/bookings",
         json={
@@ -60,7 +62,7 @@ async def test_add_and_get_my_bookings(
     date_to: str,
     booked_rooms: int,
     authenticated_ac,
-    delete_all_bookings: Callable,
+    delete_all_bookings
 ):
     response = await authenticated_ac.post(
         "/bookings",
