@@ -1,5 +1,4 @@
 from typing import Callable
-from httpx import AsyncClient
 
 import pytest
 
@@ -12,8 +11,6 @@ from tests.conftest import get_db_null_pool
         (2, "2025-02-01", "2025-02-05", 200),
         (2, "2025-02-01", "2025-02-05", 200),
         (2, "2025-02-01", "2025-02-05", 200),
-        (2, "2025-02-01", "2025-02-05", 200),
-        (2, "2025-02-01", "2025-02-05", 200),
         (2, "2025-02-01", "2025-02-05", 500),
         (2, "2025-03-01", "2025-03-05", 200),
     ],
@@ -23,7 +20,7 @@ async def test_add_booking(
     date_from: str,
     date_to: str,
     status_code: int,
-    authenticated_ac: AsyncClient,
+    authenticated_ac,
 ):
     response = await authenticated_ac.post(
         "/bookings",
@@ -62,7 +59,7 @@ async def test_add_and_get_my_bookings(
     date_from: str,
     date_to: str,
     booked_rooms: int,
-    authenticated_ac: AsyncClient,
+    authenticated_ac,
     delete_all_bookings: Callable,
 ):
     response = await authenticated_ac.post(

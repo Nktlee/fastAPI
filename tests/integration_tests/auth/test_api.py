@@ -48,6 +48,7 @@ async def test_login_user(
         assert "access_token" in response_login.json()
 
         response_get_me = await authenticated_ac.get("/auth/me")
+        print(response_get_me.json())
         assert response_get_me.json()["email"] == email
 
 

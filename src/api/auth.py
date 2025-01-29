@@ -46,7 +46,7 @@ async def login_user(data: UserRequestAdd, response: Response) -> dict:
 
 
 @router.get("/me")
-async def get_me(user_id: UserIdDep) -> BaseModel:
+async def get_me(user_id: UserIdDep):
     async with async_session_maker_null_pool() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user
