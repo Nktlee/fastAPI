@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Response
-from pydantic import BaseModel
 
 from src.repositories.users import UsersRepository
 from src.schemas.users import UserAdd, UserRequestAdd
