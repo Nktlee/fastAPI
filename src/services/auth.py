@@ -4,10 +4,11 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 import jwt
 
+from src.services.base import BaseService
 from src.config import settings
 
 
-class AuthService:
+class AuthService(BaseService):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def create_access_token(self, data: dict) -> str:
