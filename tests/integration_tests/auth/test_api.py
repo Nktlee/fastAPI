@@ -30,7 +30,7 @@ async def test_register_user(
         ("test@test.com", "1234", 200),
         ("test@example.com", "password123", 200),
         ("test2@example.com", "password123", 200),
-        ("nktlee@example.com", "password123", 401),
+        ("nktlee@example.com", "password123", 404),
         ("test2@example.com", "password12", 401),
     ],
 )

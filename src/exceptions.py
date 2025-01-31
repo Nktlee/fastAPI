@@ -22,6 +22,10 @@ class HotelNotFoundException(ObjectNotFoundException):
     detail = "Отель не найден"
 
 
+class UserNotFoundException(ObjectNotFoundException):
+    detail = "Пользователь не найден"
+
+
 class AllRoomsAreBookedException(NabronirovalException):
     detail = "Нет свободных номеров"
 
@@ -49,3 +53,23 @@ class HotelNotFoundHTTPException(NabronirovalHTTPException):
 class RoomNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
     detail = "Номер не найден"
+
+
+class UserNotFoundHTTPException(NabronirovalHTTPException):
+    status_code = 404
+    detail = "Пользователь не найден"
+
+
+class WrongPasswordHTTPException(NabronirovalHTTPException):
+    status_code = 401
+    detail = "Неправильный пароль"
+
+
+class UserAlreadyExistHTTPException(NabronirovalHTTPException):
+    status_code = 400
+    detail = "Пользователь уже существует"
+
+
+class WrongTokenHTTPException(NabronirovalHTTPException):
+    status_code = 401
+    detail = "Неправильный токен"

@@ -1,8 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Response
 
-from src.repositories.users import UsersRepository
-from src.schemas.users import UserAdd, UserRequestAdd
-from src.database import async_session_maker_null_pool
+from src.schemas.users import UserRequestAdd
 from src.services.auth import AuthService
 from src.api.dependencies import UserIdDep, DBDep
 
@@ -12,43 +10,19 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 
 @router.post("/register")
 async def register_user(db: DBDep, data: UserRequestAdd) -> dict:
-    users = await db.users.get_all()
-    emails = [user.email for user in users]
-    if data.email in emails:
-        raise HTTPException(status_code=400, detail="Пользователь уже существует")
-
-    hashed_password = AuthService().hash_password(data.password)
-    new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
-    async with async_session_maker_null_pool() as session:
-        await UsersRepository(session).add(new_user_data)
-        await session.commit()
-
+    await AuthService(db).register_user(data)
     return {"status": "ok"}
 
 
 @router.post("/login")
-async def login_user(data: UserRequestAdd, response: Response) -> dict:
-    async with async_session_maker_null_pool() as session:
-        try:
-            user = await UsersRepository(session).get_user_with_hashed_password(email=data.email)
-        except:  # noqa E722
-            raise HTTPException(
-                status_code=401, detail="Пользователь с таким email не зарегистрирован"
-            )
-        if not AuthService().verify_password(data.password, user.hashed_password):
-            raise HTTPException(status_code=401, detail="Пароль неверный")
-
-        access_token = AuthService().create_access_token({"user_id": user.id})
-        response.set_cookie("access_token", access_token)
-
-        return {"access_token": access_token}
+async def login_user(db: DBDep, data: UserRequestAdd, response: Response) -> dict:
+    access_token = await AuthService(db).login_user(data, response)
+    return {"access_token": access_token}
 
 
 @router.get("/me")
-async def get_me(user_id: UserIdDep):
-    async with async_session_maker_null_pool() as session:
-        user = await UsersRepository(session).get_one_or_none(id=user_id)
-        return user
+async def get_me(user_id: UserIdDep, db: DBDep):
+    return await db.users.get_one(id=user_id)
 
 
 @router.post("/logout")
