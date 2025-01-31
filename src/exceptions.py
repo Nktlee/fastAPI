@@ -73,3 +73,8 @@ class UserAlreadyExistHTTPException(NabronirovalHTTPException):
 class WrongTokenHTTPException(NabronirovalHTTPException):
     status_code = 401
     detail = "Неправильный токен"
+
+
+class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
+    status_code = 409
+    detail = "Нет свободных номеров"
