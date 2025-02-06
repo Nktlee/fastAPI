@@ -67,3 +67,9 @@ class AuthService(BaseService):
         response.set_cookie("access_token", access_token)
 
         return access_token
+    
+    async def get_me(self, user_id: int):
+        return await self.db.users.get_one(id=user_id)
+
+    async def logout_user(self, response: Response):
+        response.delete_cookie("access_token")

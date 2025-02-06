@@ -22,11 +22,10 @@ async def login_user(db: DBDep, data: UserRequestAdd, response: Response) -> dic
 
 @router.get("/me")
 async def get_me(user_id: UserIdDep, db: DBDep):
-    return await db.users.get_one(id=user_id)
+    return await AuthService(db).get_me(user_id)
 
 
 @router.post("/logout")
 async def logout_user(response: Response):
-    response.delete_cookie("access_token")
-
+    await AuthService().logout_user(response)
     return {"status": "ok"}

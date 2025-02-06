@@ -19,8 +19,8 @@ async def get_hotels(
     db: DBDep,
     title: str | None = Query(None, description="Название отеля"),
     location: str | None = Query(None, description="Локация отеля"),
-    date_from: date = Query(example="2025-02-01"),
-    date_to: date = Query(example="2025-02-07"),
+    date_from: date = Query(example="2026-02-01"),
+    date_to: date = Query(example="2026-02-07"),
 ):
     return await HotelService(db).get_filtered_by_time(
         pagination,
@@ -62,23 +62,23 @@ async def create_hotel(
         }
     ),
 ):
-    hotel = HotelService(db).add_hotel(hotel_data)
+    hotel = await HotelService(db).add_hotel(hotel_data)
     return {"status": "ok", "data": hotel}
 
 
 @router.delete("/{hotel_id}", summary="Удаление данных об отеле")
 async def delete_hotel(hotel_id: int, db: DBDep):
-    HotelService(db).delete_hotel(hotel_id)
+    await HotelService(db).delete_hotel(hotel_id)
     return {"status": "ok"}
 
 
 @router.put("/{hotel_id}", summary="Изменение данных об отеле")
 async def put_hotel(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
-    HotelService(db).put_hotel(hotel_id, hotel_data)
+    await HotelService(db).put_hotel(hotel_id, hotel_data)
     return {"status": "ok"}
 
 
 @router.patch("/{hotel_id}", summary="Частичное изменение данных об отеле")
 async def patch_hotel(hotel_id: int, hotel_data: HotelPatch, db: DBDep):
-    HotelService(db).patch_hotel(hotel_id, hotel_data)
+    await HotelService(db).patch_hotel(hotel_id, hotel_data)
     return {"status": "ok"}
